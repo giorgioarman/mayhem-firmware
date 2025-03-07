@@ -64,12 +64,12 @@
 #include "ui_text_editor.hpp"
 #include "ui_touchtunes.hpp"
 #include "ui_view_wav.hpp"
-#include "ui_weatherstation.hpp"
+// #include "ui_weatherstation.hpp"
 #include "ui_subghzd.hpp"
 #include "ui_whipcalc.hpp"
 #include "ui_battinfo.hpp"
 #include "ui_external_items_menu_loader.hpp"
-
+#include "ui_gnss_jammer.hpp"
 #include "ais_app.hpp"
 #include "analog_audio_app.hpp"
 // #include "ble_comm_app.hpp"
@@ -145,7 +145,7 @@ const NavigationView::AppList NavigationView::appList = {
     {"recon", "Recon", RX, Color::green(), &bitmap_icon_scanner, new ViewFactory<ReconView>()},
     {"search", "Search", RX, Color::yellow(), &bitmap_icon_search, new ViewFactory<SearchView>()},
     {"subghzd", "SubGhzD", RX, Color::yellow(), &bitmap_icon_remote, new ViewFactory<SubGhzDView>()},
-    {"weather", "Weather", RX, Color::green(), &bitmap_icon_thermometer, new ViewFactory<WeatherView>()},
+    // {"weather", "Weather", RX, Color::green(), &bitmap_icon_thermometer, new ViewFactory<WeatherView>()},
     //{"fskrx", "FSK RX", RX, Color::yellow(), &bitmap_icon_remote, new ViewFactory<FskxRxMainView>()}, //for JT
     //{"dmr", "DMR", RX, Color::dark_grey(), &bitmap_icon_dmr, new ViewFactory<NotImplementedView>()},
     //{"sigfox", "SIGFOX", RX, Color::dark_grey(), &bitmap_icon_fox, new ViewFactory<NotImplementedView>()},
@@ -162,6 +162,7 @@ const NavigationView::AppList NavigationView::appList = {
     {"rdstx", "RDS", TX, ui::Color::green(), &bitmap_icon_rds, new ViewFactory<RDSView>()},
     {"soundbrd", "Soundbrd", TX, ui::Color::green(), &bitmap_icon_soundboard, new ViewFactory<SoundBoardView>()},
     {"touchtune", "TouchTune", TX, ui::Color::green(), &bitmap_icon_touchtunes, new ViewFactory<TouchTunesView>()},
+    {"gnss_jammer", "GNSS Jam", TX, Color::red(), &bitmap_icon_remote, new ViewFactory<GnssJammerView>()},
     /* UTILITIES *************************************************************/
     {"antennalength", "Antenna Length", UTILITIES, Color::green(), &bitmap_icon_tools_antenna, new ViewFactory<WhipCalcView>()},
     {"filemanager", "File Manager", UTILITIES, Color::green(), &bitmap_icon_dir, new ViewFactory<FileManagerView>()},
