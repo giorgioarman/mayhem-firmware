@@ -339,21 +339,6 @@ set(MODE_CPPSRC
 )
 DeclareTargets(PAPR aprsrx)
 
-
-### BTLE RX
-
-set(MODE_CPPSRC
-	proc_btlerx.cpp
-)
-DeclareTargets(PBTR btlerx)
-
-### BTLE TX
-
-set(MODE_CPPSRC
-	proc_ble_tx.cpp
-)
-DeclareTargets(PBTT btletx)
-
 ### AIS
 
 set(MODE_CPPSRC
@@ -462,7 +447,12 @@ set(MODE_CPPSRC
 )
 DeclareTargets(PSIG siggen)
 
+### GNSS Jammer
 
+set(MODE_CPPSRC
+	proc_gnss_jam.cpp
+)
+DeclareTargets(PGJM gnss_jam)
 
 ### Tones
 
@@ -563,6 +553,20 @@ DeclareTargets(PUSB sd_over_usb)
 ### Place external app and disabled images below so they don't get added to the firmware
 set(add_to_firmware FALSE)
 set(MODE_FLAGS "-O3")
+
+### BTLE RX
+
+set(MODE_CPPSRC
+	proc_btlerx.cpp
+)
+DeclareTargets(PBTR btlerx)
+
+### BTLE TX
+
+set(MODE_CPPSRC
+	proc_ble_tx.cpp
+)
+DeclareTargets(PBTT btletx)
 
 ### ACARS RX
 

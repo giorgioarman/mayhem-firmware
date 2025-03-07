@@ -37,6 +37,7 @@ extern const std::filesystem::path debug_dir;
 extern const std::filesystem::path firmware_dir;
 extern const std::filesystem::path freqman_dir;
 extern const std::filesystem::path gps_dir;
+extern const std::filesystem::path gnssjam_dir;
 extern const std::filesystem::path logs_dir;
 extern const std::filesystem::path looking_glass_dir;
 extern const std::filesystem::path playlist_dir;

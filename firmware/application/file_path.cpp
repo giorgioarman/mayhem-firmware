@@ -35,6 +35,7 @@ const std::filesystem::path debug_dir = u"DEBUG";
 const std::filesystem::path firmware_dir = u"FIRMWARE";
 const std::filesystem::path freqman_dir = u"FREQMAN";
 const std::filesystem::path gps_dir = u"GPS";
+const std::filesystem::path gnssjam_dir = u"GNSS_JAMMER";
 const std::filesystem::path logs_dir = u"LOGS";
 const std::filesystem::path looking_glass_dir = u"LOOKINGGLASS";
 const std::filesystem::path playlist_dir = u"PLAYLIST";

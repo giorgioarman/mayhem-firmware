@@ -1,5 +1,28 @@
-#ifndef UI_GNSS_JAMMER_HPP
-#define UI_GNSS_JAMMER_HPP
+/*
+ * Copyright (C) 2016 Jared Boone, ShareBrained Technology, Inc.
+ * Copyright (C) 2016 Furrtek
+ * Copyright (C) 2020 Shao
+ *
+ * This file is part of PortaPack.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
+ #ifndef __UI_GNSS_JAMMER_HPP
+#define __UI_GNSS_JAMMER_HPP
 
 #include "app_settings.hpp"
 #include "ui.hpp"
@@ -16,8 +39,9 @@
 #include <memory>
 
 
-namespace ui {
-    class GnssJammerView : public View {
+namespace ui::external_app::gnssjam {
+
+class GnssJammerView : public View {
     public:
         GnssJammerView(NavigationView& nav);
         ~GnssJammerView();
@@ -28,18 +52,17 @@ namespace ui {
 
     private:
         NavigationView& nav_;
-        TxRadioState radio_state_{};
-        //TxRadioState radio_state_{
-        //    1575420000 /* frequency */,
-        //    20'000'000 /* bandwidth */,
-        //    20'000'000 /* sampling rate */
-        //};
+        //TxRadioState radio_state_{};
+        TxRadioState radio_state_{
+            1575420000 /* frequency */,
+            20'000'000 /* bandwidth */,
+            20'000'000 /* sampling rate */
+        };
         app_settings::SettingsManager settings_{
             "tx_gnss_jammer", app_settings::Mode::TX};
 
 
         uint32_t center_freq = 1575420000;
-        std::string selected_band = "L1";
         std::string selected_jammer = "LWF";
         u_int8_t tx_gain = 17;
         std::string iq_file_path;
@@ -47,9 +70,8 @@ namespace ui {
         const size_t read_size{8192};
         const size_t buffer_count{2};
 
-        const Style& style_start = *Theme::getInstance()->fg_green;
+        const Style& style_val = *Theme::getInstance()->fg_green;
         const Style& style_cancel = *Theme::getInstance()->fg_red;
-        const Style& style_restart = *Theme::getInstance()->fg_blue;
 
         std::unique_ptr<ReplayThread> replay_thread{};
         bool is_transmitting{false};
@@ -59,8 +81,6 @@ namespace ui {
 
         bool check_sd_card(); // check if the SD card is mounted
         void toggle();
-        void change_back_button();
-        void change_button();
         void start_tx();  // Start transmission
         void stop_tx(const bool do_loop);   // Stop transmission
         void set_ready();
@@ -72,7 +92,7 @@ namespace ui {
                 const auto message = *reinterpret_cast<const ReplayThreadDoneMessage*>(p);
                 this->handle_replay_thread_done(message.return_code);
             }};
-    
+
         MessageHandlerRegistration message_handler_fifo_signal{
             Message::ID::RequestSignal,
             [this](const Message* const p) {
@@ -108,7 +128,7 @@ namespace ui {
                 {"LWF", 0},
                 {"LN", 1},
                 {"TRI", 2},
-                {"TRIW", 3},
+                {"TW", 3},
                 {"TICK", 4}
             }
         };
@@ -132,8 +152,8 @@ namespace ui {
         LiveDateTime timestamp{
             {5 * 8, 34 * 8, 19 * 8, 20}  // Positioned at the bottom of the screen
         };
-    };
+};
 
 } // namespace ui::external_app::gnss_jammer
 
-#endif // UI_GNSS_JAMMER_HPP
+#endif // __UI_GNSS_JAMMER_HPP

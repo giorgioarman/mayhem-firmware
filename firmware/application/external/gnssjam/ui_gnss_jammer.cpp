@@ -1,3 +1,26 @@
+/*
+ * Copyright (C) 2016 Jared Boone, ShareBrained Technology, Inc.
+ * Copyright (C) 2016 Furrtek
+ * Copyright (C) 2020 Shao
+ *
+ * This file is part of PortaPack.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ */
+
 #include "ui_gnss_jammer.hpp"
 #include "baseband_api.hpp"
 #include "convert.hpp"
@@ -21,30 +44,15 @@ const std::unordered_map<std::string, std::string> jammerTypeMap = {
     {"LWF", "Linear Wide Fast"},
     {"LN", "Linear Narrow"},
     {"TRI", "Triangular"},
-    {"TRIW", "Triangular Wave"},
+    {"TW", "Triangular Wave"},
     {"TICK", "TICK"}
 };
 
-namespace ui 
+namespace ui ::external_app::gnssjam
 {
     // Focus function (sets default selection)
     void GnssJammerView::focus() {
         button_transmit.focus();
-    }
-
-    void GnssJammerView::change_back_button(){
-        if (is_transmitting){
-            button_transmit.set_text("STOP");
-            button_transmit.set_style(&style_cancel);
-        } else{
-            button_transmit.set_text("START");
-            button_transmit.set_style(&style_start);
-        }
-    }
-
-    void GnssJammerView::change_button(){
-        button_transmit.set_text("RESTART");
-        button_transmit.set_style(&style_restart);
     }
 
     // Constructor
@@ -52,7 +60,6 @@ namespace ui
     {
         // Update the sample rate in proc_replay baseband.
         baseband::run_image(portapack::spi_flash::image_tag_gnssjam);
-        // baseband::run_prepared_image(portapack::memory::map::m4_code.base());
 
         // Add all UI components to the view
         add_children({
@@ -73,34 +80,12 @@ namespace ui
         button_transmit.on_select = [this](Button &) {
             this->toggle();
         };
-        button_transmit.set_style(&style_start);
+        button_transmit.set_style(&style_val);
         
         // When options_tx_gain is changed
         options_tx_gain.on_change = [this](int_fast8_t v) {
-            if(is_transmitting){
-                log_console.writeln("TX gain is set: " + std::to_string(static_cast<int>(v)) + " dB");
-                transmitter_model.set_tx_gain(v);
-            }
-        };
-
-        // When options_tx_gain is changed
-        options_jammer_type.on_change = [this](size_t, OptionsField::value_t v) {
-            if(is_transmitting){
-                if (options_jammer_type.selected_index_name()!= selected_jammer)
-                    change_button();
-                else
-                    change_back_button();        
-            }
-        };
-
-        // When options_tx_gain is changed
-        options_gnss_band.on_change = [this](size_t, OptionsField::value_t v) {
-            if(is_transmitting){
-                if (options_gnss_band.selected_index_name()!= selected_band)
-                    change_button();
-                else
-                    change_back_button(); 
-            }
+            log_console.writeln("TX gain is set: " + std::to_string(static_cast<int>(v)) + " dB");
+            transmitter_model.set_tx_gain(v);
         };
 
         transmitter_model.set_sampling_rate(20000000);
@@ -118,16 +103,8 @@ namespace ui
     }
 
     void GnssJammerView::toggle() {
-        button_transmit.focus();
         if (is_transmitting) {
-            if (button_transmit.text() == "RESTART")
-            {
-                if ((bool)replay_thread)
-                    replay_thread.reset();
-                is_transmitting = false;
-                start_tx();
-            } else
-                stop_tx(false);
+            stop_tx(false);
         } else {
             start_tx();
         }
@@ -201,10 +178,10 @@ namespace ui
         }
         
         if (reader) {
-            if (!is_transmitting){
-                button_transmit.set_style(&style_cancel);
-                button_transmit.set_text("STOP");
-            }
+            button_transmit.set_style(&style_cancel);
+            button_transmit.set_text("STOP");
+            button_transmit.focus();
+            is_transmitting = true;
     
             replay_thread = std::make_unique<ReplayThread>(
                 std::move(reader),
@@ -215,7 +192,6 @@ namespace ui
                     EventDispatcher::send_message(message);
                 });
             transmitter_model.enable();
-            is_transmitting = true;
         }
     }
 
@@ -228,8 +204,8 @@ namespace ui
             start_tx();
         } else {
             log_console.writeln("stop Jamming!");
-            button_transmit.set_text("START");
-            button_transmit.set_style(&style_start);
+            button_transmit.set_text("Start!");
+            button_transmit.set_style(&style_val);
             transmitter_model.disable();
             is_transmitting = false;
         }
