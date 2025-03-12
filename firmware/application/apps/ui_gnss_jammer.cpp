@@ -66,7 +66,7 @@ namespace ui
         });
         log_console.enable_scrolling(false);
         log_console.clear(true);
-        log_console.write("App started \n");
+        log_console.writeln("App started");
         log_console.set_style(Theme::getInstance()->bg_light);
 
         // Set button behavior
@@ -78,7 +78,7 @@ namespace ui
         // When options_tx_gain is changed
         options_tx_gain.on_change = [this](int_fast8_t v) {
             if(is_transmitting){
-                log_console.writeln("TX gain is set: " + std::to_string(static_cast<int>(v)) + " dB");
+                log_console.write("\nTX gain is set: " + std::to_string(static_cast<int>(v)) + " dB");
                 transmitter_model.set_tx_gain(v);
             }
         };
@@ -106,6 +106,7 @@ namespace ui
         transmitter_model.set_sampling_rate(20000000);
         transmitter_model.set_baseband_bandwidth(20000000);
         transmitter_model.set_rf_amp(true); 
+        options_tx_gain.set_value(tx_gain);
 
         // Enable seconds in the timestamp display
         timestamp.set_seconds_enabled(true);  
@@ -113,7 +114,8 @@ namespace ui
     }
 
     GnssJammerView::~GnssJammerView() {
-        transmitter_model.disable();
+        // transmitter_model.disable();
+        stop_tx(false);
         baseband::shutdown();
     }
 
@@ -149,13 +151,13 @@ namespace ui
     {
         // stop_tx(false);
         if (!is_transmitting){
-            log_console.writeln("Start Jamming");
+            log_console.write("\nStart Jamming");
             // Check SD Card
             if(!check_sd_card()) { // Check to see if SD Card is mounted
-                log_console.writeln("Error: SD card is not mounted.");
+                log_console.write("\nError: SD card is not mounted.");
                 return;
             } else{
-                log_console.writeln("SD card is mounted.");
+                log_console.write("\nSD card is mounted.");
             }
 
             std::string selected_band = options_gnss_band.selected_index_name();
@@ -165,10 +167,10 @@ namespace ui
             } else if (selected_band == "L5") {
                 center_freq = 1176450000;
             }
-            log_console.writeln("Center freq: " + std::to_string(center_freq) + " Hz");
+            log_console.write("\nCenter freq: " + std::to_string(center_freq) + " Hz");
 
             tx_gain = options_tx_gain.value();
-            log_console.writeln("TX gain: " + std::to_string(tx_gain) + " dB");
+            log_console.write("\nTX gain: " + std::to_string(tx_gain) + " dB");
 
             selected_jammer = options_jammer_type.selected_index_name();
             std::string jammerTypeFullName = "Unknown";  // Default value
@@ -176,7 +178,7 @@ namespace ui
             if (it != jammerTypeMap.end()) {
                 jammerTypeFullName = it->second;
             }
-            log_console.writeln("Jammer type: " + jammerTypeFullName);
+            log_console.write("\nJammer type: " + jammerTypeFullName);
             iq_file_path = "/GNSS_JAMMER/BIN_FILES/" + selected_jammer + ".C8";
 
             transmitter_model.set_target_frequency(center_freq);
@@ -184,7 +186,7 @@ namespace ui
         
         // Check SD Card
         if(!check_sd_card()) { // Check to see if SD Card is mounted
-            log_console.writeln("Error: SD card is not mounted.");
+            log_console.write("\nError: SD card is not mounted.");
             return;
         }
 
@@ -193,11 +195,10 @@ namespace ui
         auto p = std::make_unique<FileReader>();
         auto open_error = p->open(iq_file_path);
         if (open_error.is_valid()) {
-            log_console.writeln("Error: Unable to read IQ file.");
+            log_console.write("\nError: Unable to read IQ file.");
             return;
         } else {
             reader = std::move(p);
-            log_console.writeln("Read IQ file.");
         }
         
         if (reader) {
@@ -216,6 +217,10 @@ namespace ui
                 });
             transmitter_model.enable();
             is_transmitting = true;
+            counter++;
+            if (counter % 10 == 0) {
+                log_console.write(".");
+            }
         }
     }
 
@@ -227,11 +232,12 @@ namespace ui
         if (do_loop) {
             start_tx();
         } else {
-            log_console.writeln("stop Jamming!");
+            log_console.write("\nstop Jamming!");
             button_transmit.set_text("START");
             button_transmit.set_style(&style_start);
             transmitter_model.disable();
             is_transmitting = false;
+            counter =0;
         }
         ready_signal = false;
     }

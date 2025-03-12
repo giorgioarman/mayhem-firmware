@@ -43,6 +43,7 @@ namespace ui {
         std::string selected_jammer = "LWF";
         u_int8_t tx_gain = 17;
         std::string iq_file_path;
+        int counter = 0;
 
         const size_t read_size{8192};
         const size_t buffer_count{2};
